@@ -1,0 +1,55 @@
+# DAL 7
+# Erin Caughman
+# 3/29/2021
+
+install.packages("tidyverse")
+library(tidyverse)
+
+install.packages("stringr")
+library(stringr)
+
+install.packages("dplyr")
+library(dplyr)
+
+
+str(gss_df$INTSPACE)
+str(gss_df$GOD)
+
+unique(gss_df$INTSPACE)
+unique(gss_df$GOD)
+
+#God- IV- categorical variable with 2 or more groups
+#intspace- DV- categorical variable with 2 or more groups 
+
+analysis_dftest <- gss_df %>%
+  filter(YEAR == 2018 & !is.na(GOD) & !is.na(INTSPACE) & (GOD == "No way to find out" | GOD == "Know god exists" | GOD == "Believe but doubt" | GOD == 'Believe sometimes' | GOD == "Some higher power" | GOD == "Dont believe") & (INTSPACE == "Moderately interested" | INTSPACE == "Not at all interested" | INTSPACE == "Very interested")) %>%
+  select(INTSPACE, GOD, WTSSALL) %>%
+  group_by(GOD, INTSPACE) %>%
+  summarise(count = sum(WTSSALL))
+
+
+analysis_dftest$INTSPACE <- str_replace(analysis_dftest$INTSPACE, "Moderately interested", "Very interested")
+analysis_dftest$GOD <- str_replace(analysis_dftest$GOD, "Believe sometimes", "Dont believe")
+analysis_dftest$GOD <- str_replace(analysis_dftest$GOD, "No way to find out", "Dont believe")
+analysis_dftest$GOD <- str_replace(analysis_dftest$GOD, "Some higher power", "Know god exists")
+
+
+analysis_dftest <- analysis_dftest %>%
+  mutate(INTSPACE = factor(INTSPACE))
+
+analysis_dftest <- analysis_dftest %>%
+  mutate(GOD = factor(GOD))
+
+analysis_dftest <- analysis_dftest %>%
+  group_by(INTSPACE, GOD) %>%
+  summarise(total_count = sum(count))
+
+
+frequency_table_dftest <- analysis_dftest %>%
+  spread(INTSPACE, total_count)
+  
+chisq.test(table(frequency_table_dftest$INTSPACE, frequency_table_dftest$GOD))
+
+
+  
+  
