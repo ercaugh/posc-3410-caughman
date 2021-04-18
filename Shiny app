@@ -1,0 +1,60 @@
+#
+# This is a Shiny web application. You can run the application by clicking
+# the 'Run App' button above.
+#
+# Find out more about building applications with Shiny here:
+#
+#    http://shiny.rstudio.com/
+#
+
+library(shiny)
+
+# Define UI for application that draws a histogram
+# Purpose:
+
+# Set Up####
+# Libraries
+library(shiny)
+
+# UI####
+ui <- fluidPage(
+    # Page title 
+    titlePanel("POSC-3410"),
+    
+    #Configure layout
+    sidebarLayout(
+        # Control panel 
+        sidebarPanel(
+            # Slider input for Year
+            sliderInput( 
+                "gss_years",
+                "Title that people will see",
+                min = min(gss_shiny$YEAR, na.rm=TRUE),
+                max = max(gss_shiny$YEAR, na.rm=TRUE),
+                value=c(min(gss_shiny$YEAR, na.rm=TRUE), max(gss_shiny$YEAR, na.rm=TRUE)),
+                sep=""
+            )
+        ),
+        mainPanel(
+            h1("Hello World"),
+            plotOutput("gss_plot"),
+            p("Description text goes here.")
+        )
+    )
+    
+)
+
+# Server####
+server<- function(input, output, session) {
+    # GSS Plot 
+    output$gss_plot <- renderPlot({
+        data <- gss_shiny %>% 
+            filter(YEAR >= input$gss_years [1] & YEAR <= input$gss_years [2])
+        data %>% 
+            ggplot(aes(x=GOD, y=n, fill=INTSPACE)) +
+            geom_bar(stat="identity")
+    })
+}
+
+# App####
+shinyApp(ui=ui, server=server)
