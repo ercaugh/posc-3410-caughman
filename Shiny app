@@ -36,9 +36,9 @@ ui <- fluidPage(
             )
         ),
         mainPanel(
-            h1("Hello World"),
+            h1("Belief in God and space exploration"),
             plotOutput("gss_plot"),
-            p("Description text goes here.")
+            p("How a persons opinion on God impacts thier interest in space exploration")
         )
     )
     
